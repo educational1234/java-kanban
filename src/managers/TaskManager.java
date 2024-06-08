@@ -61,7 +61,7 @@ public class TaskManager {
                 subtasks.remove(subtask.getId());
             }
         }
-        epics.clear();
+        subtasks.clear();
     }
 
     public Epic getEpicById(int id) {
