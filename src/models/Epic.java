@@ -1,3 +1,8 @@
+package models;
+
+
+import enums.TaskStatus;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +29,15 @@ public class Epic extends Task {
     public void removeSubtask(Subtask subtask) {
         subtasks.remove(subtask);
         updateStatus();
+    }
+
+    public void updateSubtask(Subtask subtask) {
+        for (int i = 0; i < subtasks.size(); i++) {
+            if (subtasks.get(i).getId() == subtask.getId()) {
+                subtasks.set(i, subtask);
+                return;
+            }
+        }
     }
 
     // Метод для обновления статуса эпика на основе статусов подзадач

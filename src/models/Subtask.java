@@ -1,5 +1,9 @@
+package models;
+
+import enums.TaskStatus;
+
 public class Subtask extends Task {
-    private int epicId;// Идентификатор эпика, к которому относится подзадача
+    private final int epicId;// Идентификатор эпика, к которому относится подзадача
 
     public Subtask(String title, String description, int id, TaskStatus status, int epicId) {
         super(title, description, id, status);
@@ -10,17 +14,15 @@ public class Subtask extends Task {
         return epicId;
     }
 
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
-    }
+
 
     @Override
     public String toString() {
         return "Subtask{" +
-                "title='" + getTitle() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", id=" + getId() +
-                ", status=" + getStatus() +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
                 ", epicId=" + epicId +
                 '}';
     }

@@ -1,10 +1,14 @@
+package models;
+
+import enums.TaskStatus;
+
 import java.util.Objects;
 
 public class Task {
-    private String title;
-    private String description;
-    private int id;
-    private TaskStatus status;
+    protected String title;
+    protected String description;
+    protected int id;
+    protected TaskStatus status;
 
     public Task(String title, String description, int id, TaskStatus status) {
         this.title = title;
@@ -17,11 +21,17 @@ public class Task {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public int getId() {
         return id;
@@ -39,7 +49,6 @@ public class Task {
         this.status = status;
     }
 
-    // Переопределение методов equals и hashCode для корректного сравнения задач по идентификатору
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
