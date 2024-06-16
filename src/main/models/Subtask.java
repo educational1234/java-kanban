@@ -1,6 +1,6 @@
-package models;
+package main.models;
 
-import enums.TaskStatus;
+import main.enums.TaskStatus;
 
 public class Subtask extends Task {
     private final int epicId;// Идентификатор эпика, к которому относится подзадача

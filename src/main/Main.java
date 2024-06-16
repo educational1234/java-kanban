@@ -1,29 +1,32 @@
-import managers.TaskManager;
-import models.Epic;
-import models.Subtask;
-import models.Task;
-import enums.TaskStatus;
+package main;
+
+import main.managers.InMemoryTaskManager;
+import main.managers.TaskManager;
+import main.models.Epic;
+import main.models.Subtask;
+import main.models.Task;
+import main.enums.TaskStatus;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        TaskManager manager = new InMemoryTaskManager(); // Используем InMemoryTaskManager как пример
 
         // Создание задач
         Task task1 = new Task("Task 1", "Description 1", 0, TaskStatus.NEW);
-        Task task2 = new Task("Task 2", "Description 2", 0, TaskStatus.NEW);
+        Task task2 = new Task("Task 2", "Description 2", 1, TaskStatus.NEW);
         manager.createTask(task1);
         manager.createTask(task2);
 
         // Создание эпиков
         Epic epic1 = new Epic("Epic 1", "Description Epic 1", 0, TaskStatus.NEW);
-        Epic epic2 = new Epic("Epic 2", "Description Epic 2", 0, TaskStatus.NEW);
+        Epic epic2 = new Epic("Epic 2", "Description Epic 2", 1, TaskStatus.NEW);
         manager.createEpic(epic1);
         manager.createEpic(epic2);
 
         // Создание подзадач
         Subtask subtask1 = new Subtask("Subtask 1", "Description Subtask 1", 0, TaskStatus.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask("Subtask 2", "Description Subtask 2", 0, TaskStatus.NEW, epic1.getId());
-        Subtask subtask3 = new Subtask("Subtask 3", "Description Subtask 3", 0, TaskStatus.NEW, epic2.getId());
+        Subtask subtask2 = new Subtask("Subtask 2", "Description Subtask 2", 1, TaskStatus.NEW, epic1.getId());
+        Subtask subtask3 = new Subtask("Subtask 3", "Description Subtask 3", 2, TaskStatus.NEW, epic2.getId());
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
         manager.createSubtask(subtask3);

@@ -1,6 +1,6 @@
-package models;
+package main.models;
 
-import enums.TaskStatus;
+import main.enums.TaskStatus;
 
 import java.util.Objects;
 
