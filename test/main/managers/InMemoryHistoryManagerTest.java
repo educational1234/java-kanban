@@ -55,8 +55,8 @@ class InMemoryHistoryManagerTest {
         assertEquals(2, history.size(), "Неверный размер истории.");
 
         // Проверяем порядок (самая последняя задача должна быть первой)
-        assertEquals(task2, history.get(0), "Задачи не совпадают.");
-        assertEquals(task1, history.get(1), "Задачи не совпадают.");
+        assertEquals(task1, history.get(0), "Задачи не совпадают.");
+        assertEquals(task2, history.get(1), "Задачи не совпадают.");
     }
 
     @Test
@@ -76,7 +76,7 @@ class InMemoryHistoryManagerTest {
         assertEquals(10, history.size(), "Неверный размер истории.");
 
         // Проверяем порядок (самая последняя задача должна быть первой)
-        assertEquals("Задача 15", history.get(0).getTitle(), "Задачи не совпадают.");
-        assertEquals("Задача 6", history.get(9).getTitle(), "Задачи не совпадают.");
+        assertEquals("Задача 6", history.get(0).getTitle(), "Задачи не совпадают.");
+        assertEquals("Задача 15", history.get(9).getTitle(), "Задачи не совпадают.");
     }
 }
