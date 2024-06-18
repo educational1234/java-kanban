@@ -1,4 +1,4 @@
-package test;
+package main.managers;
 
 import main.managers.TaskManager;
 import main.managers.Managers;
@@ -171,4 +171,38 @@ class InMemoryTaskManagerTest {
         assertEquals(epic, history.get(1), "Второй элемент истории не совпадает.");
         assertEquals(subtask, history.get(2), "Третий элемент истории не совпадает.");
     }
+
+    @Test
+    void testTaskEquals() {
+        // Тест эквивалентности задач по ID
+        Task task1 = new Task("Задача 1", "Описание задачи 1", 1, TaskStatus.NEW);
+        Task task2 = new Task("Задача 2", "Описание задачи 2", 1, TaskStatus.NEW);
+
+        assertEquals(task1, task2, "Задачи с одинаковым id должны быть равны.");
+    }
+
+    @Test
+    void testEpicEquals() {
+        // Тест эквивалентности эпиков по ID
+        Epic epic1 = new Epic("Эпик 1", "Описание эпика 1", 1, TaskStatus.NEW);
+        Epic epic2 = new Epic("Эпик 2", "Описание эпика 2", 1, TaskStatus.NEW);
+
+        assertEquals(epic1, epic2, "Эпики с одинаковым id должны быть равны.");
+    }
+
+    @Test
+    void testSubtaskEquals() {
+        // Тест эквивалентности подзадач по ID
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", 1, TaskStatus.NEW, 1);
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", 1, TaskStatus.NEW, 1);
+
+        assertEquals(subtask1, subtask2, "Подзадачи с одинаковым id должны быть равны.");
+    }
+
+    @Test
+    void testManagersGetDefault() {
+        // Тест проверки, что утилитарный класс возвращает проинициализированный менеджер
+        assertNotNull(Managers.getDefault(), "default manager should not be null");
+    }
+
 }
