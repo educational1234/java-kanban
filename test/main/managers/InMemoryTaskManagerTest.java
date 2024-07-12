@@ -147,16 +147,19 @@ class InMemoryTaskManagerTest {
         assertNull(savedSubtask, "Подзадача не удалена.");
     }
 
+
     @Test
     void getHistory() {
         Task task = new Task("Тестовая задача", "Описание задачи", 0, TaskStatus.NEW);
+        taskManager.createTask(task);
+
         Epic epic = new Epic("Тестовый эпик", "Описание эпика", 0, TaskStatus.NEW);
         taskManager.createEpic(epic);
+
         Subtask subtask = new Subtask("Тестовая подзадача", "Описание подзадачи", 0, TaskStatus.NEW, epic.getId());
         taskManager.createSubtask(subtask);
 
-        taskManager.createTask(task);
-
+        // Получаем задачи по их идентификаторам, чтобы добавить их в историю просмотров
         taskManager.getTaskById(task.getId());
         taskManager.getEpicById(epic.getId());
         taskManager.getSubtaskById(subtask.getId());
