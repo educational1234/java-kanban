@@ -1,6 +1,5 @@
 package main.managers;
 
-
 import main.models.Epic;
 import main.models.Subtask;
 import main.models.Task;
@@ -18,7 +17,7 @@ public interface TaskManager {
     List<Epic> getAllEpics();
     void deleteAllEpics();
     Epic getEpicById(int id);
-    void createEpic(Epic epic);
+    int createEpic(Epic epic);
     void updateEpic(Epic epic);
     void deleteEpicById(int id);
 

@@ -72,11 +72,56 @@ class InMemoryHistoryManagerTest {
 
         // Проверяем, что история не пуста
         assertNotNull(history, "История не возвращена.");
-        // Проверяем, что размер истории равен 10 (максимальное ограничение)
-        assertEquals(10, history.size(), "Неверный размер истории.");
+        // Проверяем, что размер истории равен 15 (вместо 10)
+        assertEquals(15, history.size(), "Неверный размер истории.");
 
-        // Проверяем порядок (самая последняя задача должна быть первой)
-        assertEquals("Задача 6", history.get(0).getTitle(), "Задачи не совпадают.");
-        assertEquals("Задача 15", history.get(9).getTitle(), "Задачи не совпадают.");
+        // Проверяем порядок (самая первая задача должна быть первой)
+        assertEquals("Задача 1", history.get(0).getTitle(), "Задачи не совпадают.");
+        assertEquals("Задача 15", history.get(14).getTitle(), "Задачи не совпадают.");
     }
+
+
+    //Реализация тестов ТЗ 6
+    // Реализация тестов ТЗ 6
+    @Test
+    public void testAddAndRemoveHistory() {
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        Task task1 = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        Task task2 = new Task("Task 2", "Description 2", 2, TaskStatus.IN_PROGRESS);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task1, history.get(0));
+        assertEquals(task2, history.get(1));
+
+        historyManager.remove(task1.getId());
+        history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task2, history.get(0));
+    }
+
+    @Test
+    public void testRemoveNonexistentTask() {
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        Task task1 = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        historyManager.add(task1);
+        historyManager.remove(2); // Removing a non-existent task should not affect the history
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task1, history.get(0));
+    }
+
+    @Test
+    public void testAddSameTaskMultipleTimes() {
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        Task task1 = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        historyManager.add(task1);
+        historyManager.add(task1);
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size()); // Only the latest view should be kept
+        assertEquals(task1, history.get(0));
+    }
+
 }

@@ -1,11 +1,10 @@
 package main;
 
-import main.managers.InMemoryTaskManager;
-import main.managers.TaskManager;
-import main.models.Epic;
-import main.models.Subtask;
-import main.models.Task;
 import main.enums.TaskStatus;
+import main.managers.*;
+import main.models.*;
+
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -67,5 +66,57 @@ public class Main {
 
         System.out.println("Remaining Epics:");
         System.out.println(manager.getAllEpics());
+
+        // Дополнительное задание
+        // Создаём две задачи
+        Task task3 = new Task("Task 3", "Description 3", 2, TaskStatus.NEW);
+        Task task4 = new Task("Task 4", "Description 4", 3, TaskStatus.IN_PROGRESS);
+        manager.createTask(task3);
+        manager.createTask(task4);
+
+        // Создаём эпик с тремя подзадачами
+        Epic epicWithSubtasks = new Epic("Epic 3", "Epic with subtasks", 2, TaskStatus.NEW);
+        manager.createEpic(epicWithSubtasks);
+        Subtask subtask4 = new Subtask("Subtask 4", "Description Subtask 4", 3, TaskStatus.NEW, epicWithSubtasks.getId());
+        Subtask subtask5 = new Subtask("Subtask 5", "Description Subtask 5", 4, TaskStatus.NEW, epicWithSubtasks.getId());
+        Subtask subtask6 = new Subtask("Subtask 6", "Description Subtask 6", 5, TaskStatus.NEW, epicWithSubtasks.getId());
+        manager.createSubtask(subtask4);
+        manager.createSubtask(subtask5);
+        manager.createSubtask(subtask6);
+
+        // Создаём эпик без подзадач
+        Epic epicWithoutSubtasks = new Epic("Epic 4", "Epic without subtasks", 3, TaskStatus.NEW);
+        manager.createEpic(epicWithoutSubtasks);
+
+        // Запрашиваем созданные задачи несколько раз в разном порядке
+        manager.getTaskById(task3.getId());
+        manager.getTaskById(task4.getId());
+        manager.getTaskById(epicWithSubtasks.getId());
+        manager.getTaskById(subtask4.getId());
+        manager.getTaskById(subtask5.getId());
+        manager.getTaskById(subtask6.getId());
+        manager.getTaskById(epicWithoutSubtasks.getId());
+        manager.getTaskById(task3.getId());
+        manager.getTaskById(epicWithSubtasks.getId());
+
+        // Выводим историю и убеждаемся, что в ней нет повторов
+        printHistory(manager);
+
+        // Удаляем задачу, которая есть в истории, и проверяем, что при печати она не будет выводиться
+        manager.deleteTaskById(task3.getId());
+        printHistory(manager);
+
+        // Удаляем эпик с тремя подзадачами и проверяем, что из истории удалился как сам эпик, так и все его подзадачи
+        manager.deleteEpicById(epicWithSubtasks.getId());
+        printHistory(manager);
+    }
+
+    private static void printHistory(TaskManager manager) {
+        List<Task> history = manager.getHistory();
+        System.out.println("История просмотров:");
+        for (Task task : history) {
+            System.out.println(task);
+        }
+        System.out.println();
     }
 }

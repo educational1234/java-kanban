@@ -1,7 +1,5 @@
 package main.managers;
 
-import main.managers.TaskManager;
-import main.managers.Managers;
 import main.models.Task;
 import main.models.Epic;
 import main.models.Subtask;
@@ -159,7 +157,6 @@ class InMemoryTaskManagerTest {
 
         taskManager.createTask(task);
 
-
         taskManager.getTaskById(task.getId());
         taskManager.getEpicById(epic.getId());
         taskManager.getSubtaskById(subtask.getId());
@@ -173,6 +170,75 @@ class InMemoryTaskManagerTest {
         assertEquals(subtask, history.get(2), "Третий элемент истории не совпадает.");
     }
 
+    // Реализация тестов ТЗ 6
+    @Test
+    public void testAddAndGetTask() {
+        TaskManager taskManager = new InMemoryTaskManager();
+        Task task = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        taskManager.createTask(task);
 
+        Task retrievedTask = taskManager.getTaskById(task.getId());
+        assertNotNull(retrievedTask);
+        assertEquals(task, retrievedTask);
+    }
 
+    @Test
+    public void testRemoveTask() {
+        TaskManager taskManager = new InMemoryTaskManager();
+        Task task = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        taskManager.createTask(task);
+        taskManager.deleteTaskById(task.getId());
+
+        Task retrievedTask = taskManager.getTaskById(task.getId());
+        assertNull(retrievedTask);
+        List<Task> history = taskManager.getHistory();
+        assertFalse(history.contains(task));
+    }
+
+    @Test
+    public void testGetHistory() {
+        TaskManager taskManager = new InMemoryTaskManager();
+        Task task1 = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        Task task2 = new Task("Task 2", "Description 2", 2, TaskStatus.IN_PROGRESS);
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getTaskById(task1.getId());
+
+        List<Task> history = taskManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task2, history.get(0)); // Task 2 should be first as it was added to history after task 1
+        assertEquals(task1, history.get(1)); // Task 1 should be last as it was added again after task 2
+    }
+
+    @Test
+    public void testRemoveSubtaskUpdatesEpic() {
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+        Epic epic = new Epic("Epic 1", "Epic Description", 1, TaskStatus.NEW);
+        Subtask subtask = new Subtask("Subtask 1", "Subtask Description", 2, TaskStatus.NEW, epic.getId());
+        taskManager.createEpic(epic);
+        taskManager.createSubtask(subtask);
+
+        taskManager.deleteSubtaskById(subtask.getId());
+
+        assertNull(taskManager.getSubtaskById(subtask.getId()));
+        assertFalse(epic.getSubtasks().contains(subtask));
+    }
+
+    @Test
+    public void testUpdateTaskFields() {
+        TaskManager taskManager = new InMemoryTaskManager();
+        Task task = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        taskManager.createTask(task);
+
+        task.setTitle("Updated Task 1");
+        task.setDescription("Updated Description 1");
+        taskManager.updateTask(task); // Используем updateTask для обновления задачи
+
+        Task updatedTask = taskManager.getTaskById(task.getId());
+        assertEquals("Updated Task 1", updatedTask.getTitle());
+        assertEquals("Updated Description 1", updatedTask.getDescription());
+    }
 }
