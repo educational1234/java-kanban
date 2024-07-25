@@ -1,10 +1,14 @@
 package main.managers;
 
 import main.enums.TaskStatus;
-import main.models.*;
-import java.io.*;
+import main.models.Epic;
+import main.models.Subtask;
+import main.models.Task;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -13,6 +17,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file) {
         this.file = file;
     }
+
     //save сохраняет текущее состояние менеджера в файл
     protected void save() {
         try (BufferedWriter writer = Files.newBufferedWriter(file.toPath())) {
@@ -30,6 +35,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerSaveException("Ошибка сохранения задач в файл", e);
         }
     }
+
     //Реализация методов toString/fromString для преобразования задач в строку и обратно
     private static String toString(Task task) {
         if (task instanceof Subtask) {
@@ -65,7 +71,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 throw new IllegalArgumentException("Неизвестная задача: " + type);
         }
     }
-//Реализация метода загрузки из файла
+
+    //Реализация метода загрузки из файла
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
         try {
@@ -85,9 +92,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         return manager;
     }
+
     public File getFile() {
         return file;
     }
+
     // Override
     @Override
     public int createTask(Task task) {

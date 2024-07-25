@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,13 +19,15 @@ public class FileBackedTaskManagerTest {
     @TempDir //создает временный каталог для тестов
     File tempDir;
 
-    @BeforeEach //создает экземпляр FileBackedTaskManager, используя временный файл
+    @BeforeEach
+        //создает экземпляр FileBackedTaskManager, используя временный файл
     void setUp() {
         File tempFile = new File(tempDir, "tasks.csv");
         manager = new FileBackedTaskManager(tempFile);
     }
 
-    @Test //Проверяет сохранение и загрузку пустого менеджера.
+    @Test
+        //Проверяет сохранение и загрузку пустого менеджера.
     void testSaveAndLoadEmptyManager() {
         manager.save();
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(manager.getFile());
@@ -36,7 +36,8 @@ public class FileBackedTaskManagerTest {
         assertTrue(loadedManager.getAllSubtasks().isEmpty());
     }
 
-    @Test //Проверяет создание и сохранение задач, а затем загрузку и проверку их наличия.
+    @Test
+        //Проверяет создание и сохранение задач, а затем загрузку и проверку их наличия.
     void testCreateAndSaveTasks() {
         Task task1 = new Task("Task 1", "Description 1", 0, TaskStatus.NEW);
         Task task2 = new Task("Task 2", "Description 2", 1, TaskStatus.NEW);
@@ -51,7 +52,8 @@ public class FileBackedTaskManagerTest {
         assertTrue(tasks.contains(task2));
     }
 
-    @Test //Проверяет создание и сохранение эпиков и подзадач, а затем загрузку и проверку их наличия.
+    @Test
+        //Проверяет создание и сохранение эпиков и подзадач, а затем загрузку и проверку их наличия.
     void testCreateAndSaveEpicsAndSubtasks() {
         Epic epic1 = new Epic("Epic 1", "Description Epic 1", 0, TaskStatus.NEW);
         Epic epic2 = new Epic("Epic 2", "Description Epic 2", 1, TaskStatus.NEW);
@@ -80,7 +82,8 @@ public class FileBackedTaskManagerTest {
         assertTrue(subtasks.contains(subtask3));
     }
 
-    @Test //Проверяет обновление задачи и сохранение обновленного состояния.
+    @Test
+        //Проверяет обновление задачи и сохранение обновленного состояния.
     void testUpdateTask() {
         Task task1 = new Task("Task 1", "Description 1", 0, TaskStatus.NEW);
         manager.createTask(task1);
@@ -95,7 +98,8 @@ public class FileBackedTaskManagerTest {
         assertEquals(TaskStatus.DONE, loadedTask.getStatus());
     }
 
-    @Test //Проверяет удаление задачи и сохранение состояния после удаления.
+    @Test
+        //Проверяет удаление задачи и сохранение состояния после удаления.
     void testDeleteTask() {
         Task task1 = new Task("Task 1", "Description 1", 0, TaskStatus.NEW);
         manager.createTask(task1);
