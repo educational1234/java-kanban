@@ -1,15 +1,26 @@
 package main;
 
 import main.enums.TaskStatus;
-import main.managers.*;
-import main.models.*;
+import main.managers.FileBackedTaskManager;
+import main.managers.InMemoryTaskManager;
+import main.managers.TaskManager;
+import main.models.Epic;
+import main.models.Subtask;
+import main.models.Task;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = new InMemoryTaskManager(); // Используем InMemoryTaskManager как пример
-
+        TaskManager manager = new InMemoryTaskManager();
+        File file = null;
+        try {
+            file = File.createTempFile("tasks", ".csv");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // Создание задач
         Task task1 = new Task("Task 1", "Description 1", 0, TaskStatus.NEW);
         Task task2 = new Task("Task 2", "Description 2", 1, TaskStatus.NEW);
@@ -109,6 +120,43 @@ public class Main {
         // Удаляем эпик с тремя подзадачами и проверяем, что из истории удалился как сам эпик, так и все его подзадачи
         manager.deleteEpicById(epicWithSubtasks.getId());
         printHistory(manager);
+
+        //
+
+
+        // Тестирование сохранения и загрузки пустого файла
+        manager = FileBackedTaskManager.loadFromFile(file);
+        System.out.println("Loaded empty manager: " + manager.getAllTasks().isEmpty());
+
+        // Создание задач и эпиков
+        Task task5 = new Task("Task 5", "Description 5", 5, TaskStatus.NEW);
+        Task task6 = new Task("Task 6", "Description 6", 6, TaskStatus.NEW);
+        manager.createTask(task1);
+        manager.createTask(task2);
+
+        Epic epic5 = new Epic("Epic 5", "Description Epic 5", 5, TaskStatus.NEW);
+        Epic epic6 = new Epic("Epic 6", "Description Epic 6", 6, TaskStatus.NEW);
+        manager.createEpic(epic1);
+        manager.createEpic(epic2);
+
+        // Создание подзадач
+        Subtask subtask7 = new Subtask("Subtask 7", "Description Subtask 7", 7, TaskStatus.NEW, epic1.getId());
+        Subtask subtask8 = new Subtask("Subtask 8", "Description Subtask 8", 8, TaskStatus.NEW, epic1.getId());
+        Subtask subtask9 = new Subtask("Subtask 9", "Description Subtask 9", 9, TaskStatus.NEW, epic2.getId());
+        manager.createSubtask(subtask1);
+        manager.createSubtask(subtask2);
+        manager.createSubtask(subtask3);
+
+        // Сохранение и загрузка из файла
+        manager = FileBackedTaskManager.loadFromFile(file);
+
+        // Проверка загруженных данных
+        System.out.println("Loaded Tasks:");
+        System.out.println(manager.getAllTasks());
+        System.out.println("Loaded Epics:");
+        System.out.println(manager.getAllEpics());
+        System.out.println("Loaded Subtasks:");
+        System.out.println(manager.getAllSubtasks());
     }
 
     private static void printHistory(TaskManager manager) {
