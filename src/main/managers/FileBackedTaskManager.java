@@ -16,9 +16,9 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
-    private int currentId = 0;  // Поле для хранения текущего максимального id
 
     public FileBackedTaskManager(File file) {
+
         this.file = file;
     }
 
@@ -63,17 +63,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskStatus status = TaskStatus.valueOf(parts[3]);
         String description = parts[4];
 
-        switch (type) {
-            case TASK:
-                return new Task(title, description, id, status);
-            case EPIC:
-                return new Epic(title, description, id, status);
-            case SUBTASK:
-                int epicId = Integer.parseInt(parts[5]);
-                return new Subtask(title, description, id, status, epicId);
-            default:
-                throw new IllegalArgumentException("Неизвестная задача: " + type);
-        }
+        return switch (type) {
+            case TASK -> new Task(title, description, id, status);
+            case EPIC -> new Epic(title, description, id, status);
+            case SUBTASK -> new Subtask(title, description, id, status, Integer.parseInt(parts[5]));
+        };
     }
 
     //Реализация метода загрузки из файла
@@ -86,23 +80,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Task task = fromString(lines.get(i));
                 maxId = Math.max(maxId, task.getId());
                 if (task instanceof Epic) {
-                    manager.createEpic((Epic) task);
+                    manager.epics.put(task.getId(), (Epic) task);
                 } else if (task instanceof Subtask) {
-                    manager.createSubtask((Subtask) task);
+                    manager.subtasks.put(task.getId(), (Subtask) task);
                 } else {
-                    manager.createTask(task);
+                    manager.tasks.put(task.getId(), task);
                 }
             }
-            manager.setCurrentId(maxId + 1);
+            // Восстановление подзадач в эпиках
+            for (Subtask subtask : manager.subtasks.values()) {
+                Epic epic = manager.epics.get(subtask.getEpicId());
+                if (epic != null) {
+                    epic.addSubtask(subtask);
+                }
+            }
+            manager.currentId = maxId + 1;
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка загрузки задачи из файла", e);
         }
         return manager;
     }
 
-    private void setCurrentId(int id) {
-        this.currentId = id;
-    }
 
     public File getFile() {
         return file;
