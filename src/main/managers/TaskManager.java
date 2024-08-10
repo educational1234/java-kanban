@@ -46,4 +46,10 @@ public interface TaskManager {
     List<Subtask> getSubtasksByEpicId(int epicId);
 
     List<Task> getHistory();
+
+    // Метод для получения всех задач в порядке приоритета (по времени начала)
+    List<Task> getPrioritizedTasks();
+
+    // Метод для проверки пересечения задач по времени выполнения
+    boolean isTaskOverlapping(Task task);
 }
