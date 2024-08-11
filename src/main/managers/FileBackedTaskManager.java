@@ -47,17 +47,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "";
         if (task instanceof Subtask) {
             Subtask subtask = (Subtask) task;
-            return String.format("%d,%s,%s,%s,%s,%s,%s,%d",
-                    subtask.getId(), TaskType.SUBTASK, subtask.getTitle(), subtask.getStatus(), subtask.getDescription(),
-                    duration, startTime, subtask.getEpicId());
+            return String.format("%d,%s,%s,%s,%s,%s,%s,%d", subtask.getId(), TaskType.SUBTASK, subtask.getTitle(), subtask.getStatus(), subtask.getDescription(), duration, startTime, subtask.getEpicId());
         } else if (task instanceof Epic) {
-            return String.format("%d,%s,%s,%s,%s,%s,%s,",
-                    task.getId(), TaskType.EPIC, task.getTitle(), task.getStatus(), task.getDescription(),
-                    duration, startTime);
+            return String.format("%d,%s,%s,%s,%s,%s,%s,", task.getId(), TaskType.EPIC, task.getTitle(), task.getStatus(), task.getDescription(), duration, startTime);
         } else {
-            return String.format("%d,%s,%s,%s,%s,%s,%s,",
-                    task.getId(), TaskType.TASK, task.getTitle(), task.getStatus(), task.getDescription(),
-                    duration, startTime);
+            return String.format("%d,%s,%s,%s,%s,%s,%s,", task.getId(), TaskType.TASK, task.getTitle(), task.getStatus(), task.getDescription(), duration, startTime);
         }
     }
 
@@ -67,39 +61,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (fields.length < 5) {
             throw new ManagerLoadException("Некорректная строка задачи: " + value);
         }
+        try {
+            int id = Integer.parseInt(fields[0]);
+            String type = fields[1];
+            String title = fields[2];
+            TaskStatus status = TaskStatus.valueOf(fields[3]);
+            String description = fields[4];
 
-        int id = Integer.parseInt(fields[0]);
-        String type = fields[1];
-        String title = fields[2];
-        TaskStatus status = TaskStatus.valueOf(fields[3]);
-        String description = fields[4];
-        Duration duration = fields.length > 5 && !fields[5].isEmpty() ? Duration.ofMinutes(Long.parseLong(fields[5])) : null;
-        LocalDateTime startTime = fields.length > 6 && !fields[6].isEmpty() ? LocalDateTime.parse(fields[6]) : null;
-
-        switch (type) {
-            case "TASK":
-                Task task = new Task(title, description, id, status);
-                task.setDuration(duration);
-                task.setStartTime(startTime);
-                return task;
-            case "EPIC":
-                Epic epic = new Epic(title, description, id, status);
-                epic.setDuration(duration);
-                epic.setStartTime(startTime);
-                return epic;
-            case "SUBTASK":
-                int epicId;
-                try {
-                    epicId = Integer.parseInt(fields[7]);
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    throw new ManagerLoadException("Некорректный ID эпика в подзадаче: " + value, e);
-                }
-                Subtask subtask = new Subtask(title, description, id, status, epicId);
-                subtask.setDuration(duration);
-                subtask.setStartTime(startTime);
-                return subtask;
-            default:
-                throw new ManagerLoadException("Неизвестный тип задачи: " + type);
+            switch (type) {
+                case "TASK":
+                    return new Task(title, description, id, status, Duration.ofMinutes(Long.parseLong(fields[5])), LocalDateTime.parse(fields[6]));
+                case "EPIC":
+                    return new Epic(title, description, id, status);
+                case "SUBTASK":
+                    int epicId = Integer.parseInt(fields[7]);
+                    return new Subtask(title, description, id, status, epicId, Duration.ofMinutes(Long.parseLong(fields[5])), LocalDateTime.parse(fields[6]));
+                default:
+                    throw new ManagerLoadException("Неизвестный тип задачи: " + type);
+            }
+        } catch (Exception e) {
+            throw new ManagerLoadException("Ошибка при обработке строки задачи: " + value, e);
         }
     }
 
@@ -129,6 +110,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     } else {
                         manager.tasks.put(task.getId(), task);
                     }
+                    manager.prioritizedTasks.add(task);
                 } catch (Exception e) {
                     // Если строка не может быть обработана, выбрасываем исключение
                     throw new ManagerLoadException("Ошибка загрузки задачи из строки: " + line, e);
@@ -155,32 +137,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     // Проверка пересечения задач по времени
-    private boolean isTimeConflict(Task newTask) {
-        List<Task> tasks = getAllTasks();
-        List<Subtask> subtasks = getAllSubtasks();
 
-        return tasks.stream().anyMatch(existingTask -> hasTimeConflict(existingTask, newTask))
-                || subtasks.stream().anyMatch(existingSubtask -> hasTimeConflict(existingSubtask, newTask));
-    }
-
-    private boolean hasTimeConflict(Task existingTask, Task newTask) {
-        if (existingTask.getStartTime() == null || newTask.getStartTime() == null) {
-            return false; // Нет времени, нет конфликта
-        }
-        LocalDateTime existingStart = existingTask.getStartTime();
-        LocalDateTime existingEnd = existingStart.plus(existingTask.getDuration());
-        LocalDateTime newStart = newTask.getStartTime();
-        LocalDateTime newEnd = newStart.plus(newTask.getDuration());
-
-        return newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart);
-    }
 
     // Override
     @Override
     public int createTask(Task task) {
-        if (isTimeConflict(task)) {
-            throw new IllegalArgumentException("Задача пересекается по времени с другой задачей.");
-        }
         int id = super.createTask(task);
         save();
         return id;
@@ -188,18 +149,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void updateTask(Task task) {
-        if (isTimeConflict(task)) {
-            throw new IllegalArgumentException("Задача пересекается по времени с другой задачей.");
-        }
         super.updateTask(task);
         save();
     }
 
     @Override
     public int createSubtask(Subtask subtask) {
-        if (isTimeConflict(subtask)) {
-            throw new IllegalArgumentException("Подзадача пересекается по времени с другой задачей или подзадачей.");
-        }
         int id = super.createSubtask(subtask);
         save();
         return id;
@@ -207,9 +162,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        if (isTimeConflict(subtask)) {
-            throw new IllegalArgumentException("Подзадача пересекается по времени с другой задачей или подзадачей.");
-        }
         super.updateSubtask(subtask);
         save();
     }

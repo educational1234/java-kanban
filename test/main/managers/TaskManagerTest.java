@@ -157,17 +157,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getHistory() {
-        Task task = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
-        task.setDuration(Duration.ofMinutes(60));
-        task.setStartTime(LocalDateTime.now());
+        // Создаем задачу с уникальным временем начала
+        Task task = new Task("Task 1", "Description 1", 1, TaskStatus.NEW, Duration.ofMinutes(60), LocalDateTime.now());
         taskManager.createTask(task);
 
+        // Создаем эпик
         Epic epic = new Epic("Epic 1", "Epic Description 1", 2, TaskStatus.NEW);
         taskManager.createEpic(epic);
 
-        Subtask subtask = new Subtask("Subtask 1", "Subtask Description 1", 3, TaskStatus.NEW, epic.getId());
-        subtask.setDuration(Duration.ofMinutes(90));
-        subtask.setStartTime(LocalDateTime.now().plusMinutes(60));
+        // Создаем подзадачу с временем начала, которое не пересекается с задачей
+        Subtask subtask = new Subtask("Subtask 1", "Subtask Description 1", 3, TaskStatus.NEW, epic.getId(), Duration.ofMinutes(90), task.getEndTime().plusMinutes(1));
         taskManager.createSubtask(subtask);
 
         taskManager.getTaskById(task.getId());
@@ -193,7 +192,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         Subtask subtask2 = new Subtask("Subtask 2", "Subtask Description 2", 3, TaskStatus.DONE, epicId);
         subtask2.setDuration(Duration.ofMinutes(90));
-        subtask2.setStartTime(LocalDateTime.now().plusMinutes(60));
+        subtask2.setStartTime(subtask1.getEndTime().plusMinutes(1));  // Время начала subtask2 после окончания subtask1
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);

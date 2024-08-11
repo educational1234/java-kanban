@@ -51,5 +51,5 @@ public interface TaskManager {
     List<Task> getPrioritizedTasks();
 
     // Метод для проверки пересечения задач по времени выполнения
-    boolean isTaskOverlapping(Task task);
+
 }

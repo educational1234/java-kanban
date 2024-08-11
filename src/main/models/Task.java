@@ -11,8 +11,8 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
-    private Duration duration; // Поле для продолжительности задачи
-    private LocalDateTime startTime; // Поле для времени начала задачи
+    protected Duration duration; // Поле для продолжительности задачи
+    protected LocalDateTime startTime; // Поле для времени начала задачи
 
     public Task(String title, String description, int id, TaskStatus status) {
         this.title = title;
@@ -100,14 +100,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                ", duration=" + duration +
-                ", startTime=" + startTime +
-                ", endTime=" + getEndTime() +
-                '}';
+        return "Task{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id + ", status=" + status + ", duration=" + duration + ", startTime=" + startTime + ", endTime=" + getEndTime() + '}';
     }
 }

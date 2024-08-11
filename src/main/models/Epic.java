@@ -75,20 +75,13 @@ public class Epic extends Task {
     // Метод для расчета общей продолжительности эпика
     @Override
     public Duration getDuration() {
-        return subtasks.stream()
-                .map(Subtask::getDuration)
-                .filter(Objects::nonNull)
-                .reduce(Duration.ZERO, Duration::plus);
+        return subtasks.stream().map(Subtask::getDuration).filter(Objects::nonNull).reduce(Duration.ZERO, Duration::plus);
     }
 
     // Метод для расчета времени начала эпика
     @Override
     public LocalDateTime getStartTime() {
-        return subtasks.stream()
-                .map(Subtask::getStartTime)
-                .filter(Objects::nonNull)
-                .min(LocalDateTime::compareTo)
-                .orElse(null);
+        return subtasks.stream().map(Subtask::getStartTime).filter(Objects::nonNull).min(LocalDateTime::compareTo).orElse(null);
     }
 
     // Метод для расчета времени окончания эпика
@@ -103,24 +96,13 @@ public class Epic extends Task {
 
     // Метод для обновления времени начала и окончания эпика
     private void updateTimes() {
-        this.endTime = subtasks.stream()
-                .map(Subtask::getEndTime)
-                .filter(Objects::nonNull)
-                .max(LocalDateTime::compareTo)
-                .orElse(null);
+        this.startTime = getStartTime();
+        this.endTime = subtasks.stream().map(Subtask::getEndTime).filter(Objects::nonNull).max(LocalDateTime::compareTo).orElse(null);
+        this.duration = getDuration();
     }
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "subtasks=" + subtasks +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                ", startTime=" + getStartTime() +
-                ", endTime=" + endTime +
-                ", duration=" + getDuration() +
-                '}';
+        return "Epic{" + "subtasks=" + subtasks + ", title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id + ", status=" + status + ", startTime=" + getStartTime() + ", endTime=" + endTime + ", duration=" + getDuration() + '}';
     }
 }
