@@ -70,12 +70,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
-            prioritizedTasks.remove(tasks.get(task.getId())); // Удаляем старую версию задачи из сортированного списка
             if (!isTaskOverlapping(task)) {
+                prioritizedTasks.remove(tasks.get(task.getId()));
                 tasks.put(task.getId(), task);
                 prioritizedTasks.add(task);
             } else {
-                prioritizedTasks.add(tasks.get(task.getId())); // Восстанавливаем старую версию в сортированном списке
                 throw new IllegalArgumentException("Задача пересекается с другой задачей.");
             }
         }
@@ -184,7 +183,6 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.addSubtask(subtask);
                 updateEpicDetails(epic);
                 prioritizedTasks.add(subtask);
-                updateEpicDetails(epic); // Пересчет времени и длительности эпика
                 return id;
             } else {
                 throw new IllegalArgumentException("Подзадача пересекается с другой задачей.");
@@ -196,16 +194,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
-            prioritizedTasks.remove(subtasks.get(subtask.getId())); // Удаляем старую версию подзадачи из сортированного списка
             if (!isTaskOverlapping(subtask)) {
+                prioritizedTasks.remove(subtasks.get(subtask.getId()));
                 subtasks.put(subtask.getId(), subtask);
                 Epic epic = epics.get(subtask.getEpicId());
                 if (epic != null) {
                     epic.updateSubtask(subtask);
                     updateEpicDetails(epic);
                 }
+                prioritizedTasks.add(subtask);
             } else {
-                prioritizedTasks.add(subtasks.get(subtask.getId())); // Восстанавливаем старую версию в сортированном списке
                 throw new IllegalArgumentException("Подзадача пересекается с другой задачей.");
             }
         }

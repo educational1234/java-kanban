@@ -110,10 +110,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         manager.epics.put(task.getId(), (Epic) task);
                     } else if (task instanceof Subtask) {
                         manager.subtasks.put(task.getId(), (Subtask) task);
+                        manager.prioritizedTasks.add(task);
                     } else {
                         manager.tasks.put(task.getId(), task);
+                        manager.prioritizedTasks.add(task);
                     }
-                    manager.prioritizedTasks.add(task);
+
                 } catch (Exception e) {
                     // Если строка не может быть обработана, выбрасываем исключение
                     throw new ManagerLoadException("Ошибка загрузки задачи из строки: " + line, e);
@@ -139,10 +141,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return manager;
     }
 
-    // Проверка пересечения задач по времени
-
-
-    // Override
     @Override
     public int createTask(Task task) {
         int id = super.createTask(task);

@@ -25,21 +25,19 @@ public class Epic extends Task {
     public void addSubtask(Subtask subtask) {
         subtasks.add(subtask);
         updateStatus();
-        updateTimes(); // Обновляем время начала и окончания эпика
     }
 
     // Метод для удаления подзадачи
     public void removeSubtask(Subtask subtask) {
         subtasks.remove(subtask);
         updateStatus();
-        updateTimes(); // Обновляем время начала и окончания эпика
     }
 
     public void updateSubtask(Subtask subtask) {
         for (int i = 0; i < subtasks.size(); i++) {
             if (subtasks.get(i).getId() == subtask.getId()) {
                 subtasks.set(i, subtask);
-                updateTimes(); // Обновляем время начала и окончания эпика
+                updateStatus();
                 return;
             }
         }
