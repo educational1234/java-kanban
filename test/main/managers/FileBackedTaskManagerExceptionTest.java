@@ -48,7 +48,7 @@ class FileBackedTaskManagerExceptionTest {
         FileBackedTaskManager validManager = new FileBackedTaskManager(tempFile);
 
         // Добавляем валидные данные
-        Task task = new Task("Task 1", "Description 1", 1, TaskStatus.NEW);
+        Task task = new Task("Task 1", "Description 1", 1, TaskStatus.NEW, Duration.ofMinutes(60), LocalDateTime.now());
         validManager.createTask(task);
 
         // Проверяем, что метод save() не вызывает исключений

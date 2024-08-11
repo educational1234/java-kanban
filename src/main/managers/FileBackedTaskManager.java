@@ -43,7 +43,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // Реализация методов toString/fromString для преобразования задач в строку и обратно
     private static String toString(Task task) {
-        String duration = task.getDuration() != null ? String.valueOf(task.getDuration().toMinutes()) : "";
+        String duration = task.getDuration() != null ? String.valueOf(task.getDuration().toMinutes()) : "0";
         String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "";
         if (task instanceof Subtask) {
             Subtask subtask = (Subtask) task;
@@ -58,7 +58,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static Task fromString(String value) {
         String[] fields = value.split(",");
 
-        if (fields.length < 5) {
+        if (fields.length < 7) {
             throw new ManagerLoadException("Некорректная строка задачи: " + value);
         }
         try {
@@ -67,15 +67,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             String title = fields[2];
             TaskStatus status = TaskStatus.valueOf(fields[3]);
             String description = fields[4];
+            Duration duration = fields[5].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(fields[5]));
+            LocalDateTime startTime = fields[6].isEmpty() ? null : LocalDateTime.parse(fields[6]);
+
 
             switch (type) {
                 case "TASK":
-                    return new Task(title, description, id, status, Duration.ofMinutes(Long.parseLong(fields[5])), LocalDateTime.parse(fields[6]));
+                    return new Task(title, description, id, status, duration, startTime);
                 case "EPIC":
                     return new Epic(title, description, id, status);
                 case "SUBTASK":
                     int epicId = Integer.parseInt(fields[7]);
-                    return new Subtask(title, description, id, status, epicId, Duration.ofMinutes(Long.parseLong(fields[5])), LocalDateTime.parse(fields[6]));
+                    return new Subtask(title, description, id, status, epicId, duration, startTime);
                 default:
                     throw new ManagerLoadException("Неизвестный тип задачи: " + type);
             }
