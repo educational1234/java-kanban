@@ -237,7 +237,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    private void updateEpicDetails(Epic epic) {
+    void updateEpicDetails(Epic epic) {
         Duration totalDuration = epic.getSubtasks().stream().map(Subtask::getDuration).filter(Objects::nonNull).reduce(Duration.ZERO, Duration::plus);
         epic.setDuration(totalDuration);
 

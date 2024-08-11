@@ -41,10 +41,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    // Реализация методов toString/fromString для преобразования задач в строку и обратно
+    //Реализация методов toString/fromString для преобразования задач в строку и обратно
     private static String toString(Task task) {
         String duration = task.getDuration() != null ? String.valueOf(task.getDuration().toMinutes()) : "0";
         String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "";
+
         if (task instanceof Subtask) {
             Subtask subtask = (Subtask) task;
             return String.format("%d,%s,%s,%s,%s,%s,%s,%d", subtask.getId(), TaskType.SUBTASK, subtask.getTitle(), subtask.getStatus(), subtask.getDescription(), duration, startTime, subtask.getEpicId());
@@ -53,12 +54,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } else {
             return String.format("%d,%s,%s,%s,%s,%s,%s,", task.getId(), TaskType.TASK, task.getTitle(), task.getStatus(), task.getDescription(), duration, startTime);
         }
+
+
     }
+
 
     private static Task fromString(String value) {
         String[] fields = value.split(",");
 
         if (fields.length < 7) {
+
             throw new ManagerLoadException("Некорректная строка задачи: " + value);
         }
         try {
@@ -86,6 +91,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerLoadException("Ошибка при обработке строки задачи: " + value, e);
         }
     }
+
 
     // Реализация метода загрузки из файла
     public static FileBackedTaskManager loadFromFile(File file) {
@@ -131,7 +137,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     throw new ManagerLoadException("Эпик с ID " + subtask.getEpicId() + " для подзадачи с ID " + subtask.getId() + " не найден.");
                 }
             }
-
+            // Пересчет времени и длительности эпиков
+            for (Epic epic : manager.epics.values()) {
+                manager.updateEpicDetails(epic);
+            }
             manager.currentId = maxId + 1;
 
         } catch (IOException e) {
