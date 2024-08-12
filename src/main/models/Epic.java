@@ -1,13 +1,14 @@
 package main.models;
 
-
 import main.enums.TaskStatus;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks;
+    private LocalDateTime endTime; // Новое поле для хранения времени окончания эпика
 
     public Epic(String title, String description, int id, TaskStatus status) {
         super(title, description, id, status);
@@ -15,7 +16,6 @@ public class Epic extends Task {
     }
 
     public List<Subtask> getSubtasks() {
-
         return subtasks;
     }
 
@@ -35,6 +35,7 @@ public class Epic extends Task {
         for (int i = 0; i < subtasks.size(); i++) {
             if (subtasks.get(i).getId() == subtask.getId()) {
                 subtasks.set(i, subtask);
+                updateStatus();
                 return;
             }
         }
@@ -67,14 +68,18 @@ public class Epic extends Task {
         }
     }
 
+    // Метод для расчета времени окончания эпика
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     @Override
     public String toString() {
-        return "Epic{" +
-                "subtasks=" + subtasks +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                '}';
+        return "Epic{" + "subtasks=" + subtasks + ", title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id + ", status=" + status + ", startTime=" + getStartTime() + ", endTime=" + endTime + ", duration=" + getDuration() + '}';
     }
 }

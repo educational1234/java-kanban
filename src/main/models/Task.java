@@ -2,6 +2,8 @@ package main.models;
 
 import main.enums.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -9,12 +11,25 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
+    protected Duration duration; // Поле для продолжительности задачи
+    protected LocalDateTime startTime; // Поле для времени начала задачи
 
     public Task(String title, String description, int id, TaskStatus status) {
         this.title = title;
         this.description = description;
         this.id = id;
         this.status = status;
+        this.duration = Duration.ZERO; // Инициализация по умолчанию
+        this.startTime = null; // Инициализация по умолчанию
+    }
+
+    public Task(String title, String description, int id, TaskStatus status, Duration duration, LocalDateTime startTime) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public String getTitle() {
@@ -49,6 +64,27 @@ public class Task {
         this.status = status;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    // Метод для расчета времени окончания задачи
+    public LocalDateTime getEndTime() {
+        return (startTime != null && duration != null) ? startTime.plus(duration) : null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,11 +100,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                '}';
+        return "Task{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", id=" + id + ", status=" + status + ", duration=" + duration + ", startTime=" + startTime + ", endTime=" + getEndTime() + '}';
     }
 }

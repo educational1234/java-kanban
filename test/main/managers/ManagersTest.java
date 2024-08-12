@@ -10,6 +10,7 @@ public class ManagersTest {
         // Тест проверки, что утилитарный класс возвращает проинициализированный менеджер
         assertNotNull(Managers.getDefault(), "default manager should not be null");
     }
+
     @Test
     void testGetDefaultHistory() {
         // Тест проверки, что утилитарный класс возвращает проинициализированный менеджер истории
