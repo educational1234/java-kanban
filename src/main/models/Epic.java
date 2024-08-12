@@ -2,11 +2,9 @@ package main.models;
 
 import main.enums.TaskStatus;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks;
@@ -70,18 +68,6 @@ public class Epic extends Task {
         }
     }
 
-    // Метод для расчета общей продолжительности эпика
-    @Override
-    public Duration getDuration() {
-        return subtasks.stream().map(Subtask::getDuration).filter(Objects::nonNull).reduce(Duration.ZERO, Duration::plus);
-    }
-
-    // Метод для расчета времени начала эпика
-    @Override
-    public LocalDateTime getStartTime() {
-        return subtasks.stream().map(Subtask::getStartTime).filter(Objects::nonNull).min(LocalDateTime::compareTo).orElse(null);
-    }
-
     // Метод для расчета времени окончания эпика
     @Override
     public LocalDateTime getEndTime() {
@@ -90,13 +76,6 @@ public class Epic extends Task {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    // Метод для обновления времени начала и окончания эпика
-    private void updateTimes() {
-        this.startTime = getStartTime();
-        this.endTime = subtasks.stream().map(Subtask::getEndTime).filter(Objects::nonNull).max(LocalDateTime::compareTo).orElse(null);
-        this.duration = getDuration();
     }
 
     @Override
