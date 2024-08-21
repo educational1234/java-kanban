@@ -43,6 +43,11 @@ public class TasksHandler extends BaseHttpHandler {
     protected void handlePost(HttpExchange exchange) throws IOException {
         logger.info("Обработка POST-запроса для задач");
         String body = new String(exchange.getRequestBody().readAllBytes());
+        if (body.isEmpty()) {
+            logger.warning("Пустое тело запроса");
+            sendBadRequest(exchange);
+            return;
+        }
         logger.info("Получен POST-тело: " + body);
         try {
             Task task = gson.fromJson(body, Task.class);

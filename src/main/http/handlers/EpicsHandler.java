@@ -33,6 +33,20 @@ public class EpicsHandler extends BaseHttpHandler {
                 logger.severe("Неверный формат ID в GET-запросе: " + e.getMessage());
                 sendBadRequest(exchange);
             }
+        } else if (uriParts.length == 4 && "subtasks".equals(uriParts[3])) {  // Новый эндпоинт
+            try {
+                int id = Integer.parseInt(uriParts[2]);
+                Epic epic = manager.getEpicById(id);
+                if (epic == null) {
+                    sendNotFound(exchange);
+                    return;
+                }
+                String response = gson.toJson(manager.getSubtasksByEpicId(id));
+                sendText(exchange, response);
+            } catch (NumberFormatException e) {
+                logger.severe("Неверный формат ID в GET-запросе: " + e.getMessage());
+                sendBadRequest(exchange);
+            }
         } else {
             String response = gson.toJson(manager.getAllEpics());
             sendText(exchange, response);
@@ -43,6 +57,11 @@ public class EpicsHandler extends BaseHttpHandler {
     protected void handlePost(HttpExchange exchange) throws IOException {
         logger.info("Обработка POST-запроса для эпиков");
         String body = new String(exchange.getRequestBody().readAllBytes());
+        if (body.isEmpty()) {
+            logger.warning("Пустое тело запроса");
+            sendBadRequest(exchange);
+            return;
+        }
         logger.info("Получен POST-тело: " + body);
         try {
             Epic epic = gson.fromJson(body, Epic.class);

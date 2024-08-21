@@ -43,6 +43,11 @@ public class SubtasksHandler extends BaseHttpHandler {
     protected void handlePost(HttpExchange exchange) throws IOException {
         logger.info("Обработка POST-запроса для подзадач");
         String body = new String(exchange.getRequestBody().readAllBytes());
+        if (body.isEmpty()) {
+            logger.warning("Пустое тело запроса");
+            sendBadRequest(exchange);
+            return;
+        }
         logger.info("Получен POST-тело: " + body);
         try {
             Subtask subtask = gson.fromJson(body, Subtask.class);
